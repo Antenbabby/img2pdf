@@ -341,14 +341,6 @@ export default {
         this.unitDisabled = false
         this.pageDirectionDisabled = false
       }
-    },
-    connectImage(n) {
-      if (n === 'Y') {
-        this.pageDirection = 'landscape'
-        this.pageDirectionDisabled = true
-      } else {
-        this.pageDirectionDisabled = false
-      }
     }
   }
 }
