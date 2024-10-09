@@ -1,8 +1,10 @@
 # img2pdf 图片转PDF
 
+## 本项目从 [img2pdf](https://github.com/NPCDW/img2pdf) fork 而来,实现了拼接长图功能,及拼接长图后再生成pdf的功能
+
 基于 [jsPDF](https://github.com/parallax/jsPDF) 实现的在线图片转PDF功能
 
-试一下：[https://npcdw.github.io/img2pdf/](https://npcdw.github.io/img2pdf/)
+试一下：[https://antenbabby.github.io/img2pdf/](https://antenbabby.github.io/img2pdf/)
 
 为什么要编写此项目
 

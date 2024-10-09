@@ -1,7 +1,8 @@
 <template>
   <div style="display: flex;margin: 40px;">
     <div style="height: 800px;min-width:550px;position:relative; z-index:999">
-      <embed :src="pdfSrc" type="application/pdf" style="overflow: auto; width: 100%; height: 100%;"/>
+      <embed v-show="pdfSrc!==undefined" :src="pdfSrc" type="application/pdf" style="overflow: auto; width: 100%; height: 100%;"/>
+      <el-image style="height: 800px;min-width:550px;" :fit="'contain'" :src="longImageUrl" v-show="longImageUrl!==undefined&&pdfSrc===undefined"/>
     </div>
     <div style="margin: 40px;">
       <el-upload action="#" list-type="picture-card" :auto-upload="false" accept="image/*" :file-list="fileList"
@@ -38,6 +39,7 @@
               <el-radio label="N">否</el-radio>
               <el-radio label="Y">是</el-radio>
             </el-radio-group>
+            <el-button style="margin-left: 20px" type="primary" v-if="connectImage==='Y'" @click="showLongImage" :loading="loading">预览</el-button>
           </div>
         </div>
         <div v-if="connectImage==='N'">
@@ -146,6 +148,7 @@ export default {
       unit: 'mm',
       password: null,
       pdfSrc: undefined,
+      longImageUrl: undefined
     };
   },
   computed: {
@@ -236,6 +239,41 @@ export default {
       }).catch(e => {
         console.error(e)
         this.$message.error("导出失败")
+        this.loading = false
+      })
+    },
+    showLongImage(){
+      if (this.fileList.length === 0) {
+        this.$message.warning('请先上传至少一张图片')
+        return;
+      }
+      this.loading = true
+      let allPromise = []
+      for (let i = 0; i < this.fileList.length; i++) {
+        allPromise.push(this.getFormat(this.fileList[i]))
+      }
+      Promise.all(allPromise).then(() => {
+        //拼接长图
+        //最大宽度
+        let width = Math.max(...this.fileList.map(it => it.width));
+        // 获取总高度
+        const heights = this.fileList.map(item => width * item.height / item.width + 1)
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = heights.reduce((total, current) => total + current)
+        const context = canvas.getContext('2d')
+        let y = 0
+        this.fileList.forEach((item, index) => {
+          const height = heights[index]
+          context.drawImage(item.canvas, 0, y, width, height)
+          y = y + height + 1
+        })
+        this.longImageUrl=canvas.toDataURL('image/jpeg',1)
+        this.pdfSrc=undefined
+        this.loading = false
+      }).catch(e => {
+        console.error(e)
+        this.$message.error("预览失败")
         this.loading = false
       })
     },
